@@ -1,2 +1,1 @@
-import iter
-from _final import foreach
+from ._final import foreach

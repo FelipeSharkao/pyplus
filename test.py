@@ -12,6 +12,6 @@ print()
 @foreach(['a', 'b', 'c', 'd', 'e'])
 def anonym(iter):
 	if (iter.key == 2):
-		return iter.back
+		return iter.next
 
 	print(iter.val)

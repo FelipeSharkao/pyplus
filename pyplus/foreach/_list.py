@@ -1,4 +1,4 @@
-from iter import ForeachIterList
+from .iter import ForeachIterList
 
 
 def foreach_list(l, step=1):

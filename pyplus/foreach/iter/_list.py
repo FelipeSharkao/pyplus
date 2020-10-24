@@ -1,4 +1,4 @@
-from _generic import AbstractForeachIter, ForeachInterface, var
+from ._generic import AbstractForeachIter, ForeachInterface, var
 
 
 @AbstractForeachIter.register

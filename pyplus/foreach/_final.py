@@ -1,3 +1,6 @@
+from ._range import foreach_range
+from ._list import foreach_list
+
 def foreach(*args):
     _type = type(args[0])
     if _type is int:

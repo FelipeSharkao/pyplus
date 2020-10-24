@@ -1,4 +1,4 @@
-from iter import ForeachIterRange
+from .iter import ForeachIterRange
 
 
 def foreach_range(a, b=None, step=1):
