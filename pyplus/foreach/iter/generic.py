@@ -17,33 +17,38 @@ class AbstractForeachIter(ABC):
     val = var('_val', abstractproperty)
     
     @abstractmethod
-    def __skip__(self):
-        self.val += self.step
+    def __next__(self):
+        pass
     
     @abstractmethod
-    def __previous__(self):
-        self.val -= self.step
+    def __prev__(self):
+        pass
+    
+    @abstractmethod
+    def __stop__(self):
+        pass
+    
+    @abstractproperty
+    def isended(self):
+        pass
 
 
 class ForeachInterface:
-    @property
     def next(self):
-        return None
-    
-    @property
-    def repeat(self):
-        return False
-    
-    @property
-    def stop(self):
+        self.__next__()
+        if self.isended:
+            self.__stop__()
         return True
     
-    @property
-    def skip(self):
-        self.__skip__()
-        return self.next
+    def skipone(self):
+        self.next()
+        if not self.isended:
+            self.next()
     
-    @property
-    def previous(self):
-        self.__previous__()
-        return self.repeat
+    def again(self):
+        return True
+    
+    def prev(self):
+        self.__prev__()
+        return True
+    

@@ -5,7 +5,7 @@ def foreach(*args):
     def wrapper(func):
         _iter = iter(*args)
 
-        while not _iter.ended:
+        while not _iter.isended:
             if not func(_iter):
                 _iter.next()
 
