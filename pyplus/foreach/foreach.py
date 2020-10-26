@@ -1,4 +1,4 @@
-from .iter import foreach_iter as iter
+from .iter import foreachiter as iter
 
 
 def foreach(*args):
