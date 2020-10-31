@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod, abstractproperty
 
-_pairs = {}
-
+_pairs = dict()
 
 def var(store, f=property):
     def getter(self):
@@ -16,10 +15,10 @@ def var(store, f=property):
     return f(getter, setter, deleter)
 
 
-class AbstractForeachIter(ABC):
+class ForeachIterMeta(ABC):
     @classmethod
     def __prepare__(metacls, name, bases, **kargs):
-        dict = super.__prepare__(name, bases, **kargs)
+        dict = ABC.__prepare__(name, bases, **kargs)
 
         @property
         def isended(self):
@@ -27,55 +26,64 @@ class AbstractForeachIter(ABC):
         
         def stop(self):
             if not self._stopped:
-                self.__stop__()
+                self.dostop()
                 self._stopped = True
-            return True
+            return self
 
         def next(self):
-            self.__next__()
-            return True
+            if not self._stopped:
+                self.donext()
+            return self
 
         def skipone(self):
-            self.__next__()
-            return False
-
-        def again(self):
-            return True
+            if not self._stopped:
+                self.donext()
+                self.donext()
+            return self
 
         def prev(self):
-            self.__prev__()
-            return True
+            if not self._stopped:
+                self.doprev()
+            return self
 
         return dict + {
             '_stopped': False,
             'isended': isended,
-            '__stop__': lambda self: None,
+            'dostop': lambda self: None,
             'stop': stop,
             'next': next,
             'skipone': skipone,
-            'again': again,
             'prev': prev,
         }
 
-    def __new__(metacls, name, bases, namespace, **kargs):
-        return super().__new__(metacls, name, bases, namespace)
-
-    def __init__(cls, name, bases, namespace, types, **kargs):
-        super().__init__(name, bases, namespace)
-        for x in types:
-            _pairs[tuple(x)] = cls
+    def __new__(metacls, name, bases, kargs):
+        return ABC.__new__(metacls)
 
     key = var('_key', abstractproperty)
     val = var('_val', abstractproperty)
 
     @abstractmethod
-    def __next__(self):
+    def donext(self):
         pass
 
     @abstractmethod
-    def __prev__(self):
+    def doprev(self):
         pass
 
+def registeriter(*types):
+    def wrapper(cls):
+        cls = ForeachIterMeta(cls.__name__, cls.__bases__, cls.__dict__)
+
+        for x in types:
+            if isinstance(x, tuple):
+                _pairs[x] = cls
+            elif isinstance(x, list):
+                _pairs[tuple(x)] = cls
+            else:
+                _pairs[(x)] = cls
+
+        return cls
+    return wrapper
 
 def foreachiter(*args):
     types = (type(x) for x in args)

@@ -1,10 +1,11 @@
-from ._generic import AbstractForeachIter
+from .generic import registeriter
 
 
-class ForeachIterList(mataclass=AbstractForeachIter, types=[
+@registeriter(
     (list),
-    (list, int),
-]):
+    (list, int)
+)
+class ForeachIterList:
     @property
     def list(self):
         return self._list
@@ -45,14 +46,14 @@ class ForeachIterList(mataclass=AbstractForeachIter, types=[
         self._key = 0
         self.step = step
     
-    def __next__(self):
+    def donext(self):
         try:
             self.key += self.step
         except IndexError:
             self.key = len(self.list) - 1
             self.stop()
     
-    def __prev__(self):
+    def doprev(self):
         try:
             self.key -= self.step
         except IndexError:
