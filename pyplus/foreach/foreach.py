@@ -1,13 +1,13 @@
-from .iter import foreachiter as iter
+from .iter import foreachiter
 
 
 def foreach(*args):
     def wrapper(func):
-        _iter = iter(*args)
+        iter = foreachiter(*args)
 
-        while not _iter.isended:
-            if not func(_iter):
-                _iter.next()
+        while not iter.isended:
+            if not func(iter):
+                iter.next()
 
         del func
         return None

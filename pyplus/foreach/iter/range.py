@@ -2,7 +2,7 @@ from .generic import registeriter
 
 
 @registeriter(
-    (int)
+    (int),
     (int, int),
     (int, int, int),
 )
@@ -51,18 +51,19 @@ class ForeachIterRange:
 
     def __init__(self, a, b=None, step=1):
         if b:
-            self._a = a
-            self._b = b
+            self._start = a
+            self._end = b
         else:
-            self._a = 0
-            self._b = a
+            self._start = 0
+            self._end = a
+        self.val = self.start
         self.step = step
     
     def donext(self):
         try:
             self.val += self.step
         except IndexError:
-            self.val = self.end
+            self.val = self.end - self.step
             self.stop()
     
     def doprev(self):

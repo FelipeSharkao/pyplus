@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 _pairs = dict()
 
@@ -15,11 +15,27 @@ def var(store, f=property):
     return f(getter, setter, deleter)
 
 
-class ForeachIterMeta(ABC):
+class ForeachIterMeta(ABCMeta):
     @classmethod
-    def __prepare__(metacls, name, bases, **kargs):
-        dict = ABC.__prepare__(name, bases, **kargs)
+    def __prepare__(cls, name, bases, **kargs):
+        return super().__prepare__(name, bases, **kargs)
 
+    def __new__(cls, name, bases, kargs):
+        return super().__new__(cls, name, bases, kargs)
+
+    key = var('_key', abstractproperty)
+    val = var('_val', abstractproperty)
+
+    @abstractmethod
+    def donext(self):
+        pass
+
+    @abstractmethod
+    def doprev(self):
+        pass
+
+def registeriter(*types):
+    def wrapper(cls):
         @property
         def isended(self):
             return self._stopped
@@ -46,7 +62,7 @@ class ForeachIterMeta(ABC):
                 self.doprev()
             return self
 
-        return dict + {
+        defaultdict = {
             '_stopped': False,
             'isended': isended,
             'dostop': lambda self: None,
@@ -56,39 +72,23 @@ class ForeachIterMeta(ABC):
             'prev': prev,
         }
 
-    def __new__(metacls, name, bases, kargs):
-        return ABC.__new__(metacls)
-
-    key = var('_key', abstractproperty)
-    val = var('_val', abstractproperty)
-
-    @abstractmethod
-    def donext(self):
-        pass
-
-    @abstractmethod
-    def doprev(self):
-        pass
-
-def registeriter(*types):
-    def wrapper(cls):
-        cls = ForeachIterMeta(cls.__name__, cls.__bases__, cls.__dict__)
+        cls = ForeachIterMeta(cls.__name__, (cls,) + cls.__bases__, {**cls.__dict__, **defaultdict})
 
         for x in types:
-            if isinstance(x, tuple):
+            if type(x) is tuple:
                 _pairs[x] = cls
-            elif isinstance(x, list):
+            elif type(x) is list:
                 _pairs[tuple(x)] = cls
             else:
-                _pairs[(x)] = cls
+                _pairs[tuple([x])] = cls
 
         return cls
     return wrapper
 
 def foreachiter(*args):
-    types = (type(x) for x in args)
+    types = tuple(type(x) for x in args)
 
-    if types in _pairs:
+    if types in _pairs.keys():
         return _pairs[types](*args)
 
     raise TypeError
