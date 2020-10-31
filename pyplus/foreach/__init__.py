@@ -1,1 +1,1 @@
-from ._final import foreach
+from .foreach import foreach

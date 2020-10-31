@@ -1,2 +1,3 @@
-from ._range import ForeachIterRange
-from ._list import ForeachIterList
+from .generic import registeriter, foreachiter
+from .list import ForeachIterList
+from .range import ForeachIterRange
