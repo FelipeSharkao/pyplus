@@ -1,1 +1,1 @@
-from .foreach import *
+from .each import *

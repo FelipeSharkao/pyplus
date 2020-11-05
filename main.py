@@ -1,22 +1,24 @@
-from pyplus import foreach
+from pyplus import each
 
-@foreach(3, 7)
-def anonym(iter):
-	if (iter.val == 2):
-		return iter.skipone()
+for x in each(3, 7):
+	if (x.val == 2):
+		x.key += 1
+		continue
 
-	print(iter.val)
+	print(x.val)
 
 print()
 
-@foreach(['a', 'b', 'c', 'd', 'e'])
-def anonym(iter):
-	if (iter.key == 1):
-		return iter.skipone()
+for x in each(['a', 'b', 'c', 'd', 'e']):
+	if (x.key == 1):
+		x.key += 1
+		continue
 
-	print(iter.val)
+	print(x.val)
 
-	if (iter.key == 2):
-		return iter.skipone()
-	elif (iter.key == 3):
-		return iter.prev()
+	if (x.key == 2):
+		x.key += 1
+		continue
+	elif (x.key == 3):
+		x.key -= 2
+		continue
