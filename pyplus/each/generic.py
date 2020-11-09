@@ -5,6 +5,8 @@ _pairs = {}
 
 
 class EachIterMeta(ABCMeta):
+    """The metaclass for each iterators. Requires the implementation of the properties 'key', 'val', and 'isended'"""
+
     @classmethod
     def __prepare__(cls, name, bases, **kargs):
         return super().__prepare__(name, bases, **kargs)
@@ -29,6 +31,12 @@ class EachIterMeta(ABCMeta):
 
 
 def each(*args):
+    '''
+    Generator for each iterator, allow for better stream control
+
+    Args:
+        *args: the paramaters passed for the each iterator, should have tha same signature of a valid each itarator
+    '''
     types = tuple(type(x) for x in args)
     _iter = None
 
@@ -43,8 +51,19 @@ def each(*args):
 
 
 def eachiter(*args):
+    """"
+    Registers a class as a each iterator. Requires the implementation of the properties 'key', 'val', and 'isended'
+
+    Args:
+        *args (Type | str): a valid signature used for calling the each iterator, should be the same of the '__init__' method. Use the literal '?' to indicate the that the following arguments ar optional, use a tuple of Types to indicate multiple valid types for the same argument. Doesn't support keyword arguments
+    """
     def wrapper(cls):
-        newcls = EachIterMeta(cls.__name__, (cls,) + cls.__bases__, dict(cls.__dict__))
+        newcls = EachIterMeta(
+            cls.__name__,
+            (cls,) + cls.__bases__,
+            dict(cls.__dict__)
+        )
+        newcls.__doc__ = cls.__doc__
         del cls
 
         def readsignature(args, past=[], opt=False):
