@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from copy import copy 
 
 _pairs = {}
 
@@ -46,23 +47,37 @@ def eachiter(*args):
         newcls = EachIterMeta(cls.__name__, (cls,) + cls.__bases__, dict(cls.__dict__))
         del cls
 
-        lst = []
-        opt = False
-        for x in args:            
-            if isinstance(x, str):
-                if x == '?':
-                    if not opt:
-                        opt = True
+        def readsignature(args, past=[], opt=False):
+            last = copy(past)
+            args = list(copy(args))
+
+            for i in range(len(args)):
+                if isinstance(args[i], tuple) or isinstance(args[i], list):
+                    if len(args[i]) > 1:
+                        for j in range(1, len(args[i])):
+                            nargs = copy(args[i:])
+                            nargs[0] = args[i][j]
+                            readsignature(nargs, last, opt)
+                        args[i] = args[i][0]
                     else:
-                        raise ValueError("Literal '?' can only be used once.")
+                        raise ValueError(f"Type union '{args[i]}' should have two types or more.")
+                
+                if isinstance(args[i], str):
+                    if args[i] == '?':
+                        if not opt:
+                            opt = True
+                        else:
+                            raise ValueError("Literal '?' can only be used once.")
+                    else:
+                        raise ValueError(f"Unexpected string '{args[i]}'")
                 else:
-                    raise ValueError(f"Unexpected string '{x}'")
-            else:
-                if opt:
-                    _pairs[tuple(lst)] = newcls
-                lst.append(x)
-        
-        _pairs[tuple(lst)] = newcls
+                    if opt:
+                        nargs = copy(args[i + 1:])
+                        readsignature(nargs, last, opt)
+                    last.append(args[i])
+            _pairs[tuple(last)] = newcls
+
+        readsignature(args)
 
         return newcls
     return wrapper
