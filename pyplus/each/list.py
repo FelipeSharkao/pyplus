@@ -1,7 +1,7 @@
 from .generic import eachiter
 
 
-@eachiter(list, '?', int)
+@eachiter((list, tuple), '?', int)
 class EachIterList:
     def __init__(self, list, step=1):
         self._list = list

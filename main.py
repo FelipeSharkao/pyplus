@@ -9,7 +9,7 @@ for x in each(3, 7):
 
 print()
 
-for x in each(['a', 'b', 'c', 'd', 'e']):
+for x in each(('a', 'b', 'c', 'd', 'e')):
 	if (x.key == 1):
 		x.key += 1
 		continue
